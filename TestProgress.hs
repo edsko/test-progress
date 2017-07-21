@@ -50,7 +50,20 @@ runDelay (Later d') = let ~(p', r') = runDelay d' in (NotYet p', r')
 runDelay :: Delay a -> (Progress, a)
 runDelay (Now a)    = (Done, a)
 runDelay (Later d') = let p'r' = runDelay d'
-                              in (NotYet (fst p'r'), snd p'r')
+                      in (NotYet (fst p'r'), snd p'r')
+#endif
+
+#if defined(Alg_explicit_inlined)
+-- explicitly written out lazy pattern match, inlining fst and snd
+-- the selector thunk optimization is highly sensitive to inlining;
+-- see <https://ghc.haskell.org/trac/ghc/wiki/Commentary/Rts/Storage/HeapObjects>
+-- see <https://ghc.haskell.org/trac/ghc/ticket/2607>
+runDelay :: Delay a -> (Progress, a)
+runDelay (Now a)    = (Done, a)
+runDelay (Later d') = let p'r' = runDelay d'
+                      in ( NotYet (case p'r' of (p', _) -> p')
+                         ,         case p'r' of (_, r') -> r'
+                         )
 #endif
 
 #if defined(Alg_lazyst)
