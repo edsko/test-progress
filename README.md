@@ -13,6 +13,7 @@ lazylet          ~150M     --          --        --
 david2           ~600M     ~600M       ~600M     ~600M
 david2-separate  ~600M     ~600M       ~600M     ~600M
 explicit         ~600M     ~600M       ~600M     ~600M
+explicit_inlined ~150M     --          --        --
 
 lazyst           ~150M     --          --        -- 
 ```
