@@ -35,7 +35,7 @@ GHC=ghc -Wall -Werror -fforce-recomp -prof
 	       -DTop_$(word 2, $(subst -, ,$@)) \
 				 -DAlg_$(word 4, $(subst -, ,$@)) \
 				 TestProgress
-	./TestProgress +RTS -hy
+	./TestProgress +RTS -hy -s
 	mv TestProgress.hp $(subst jpg,hp,$@)
 	hp2ps -c $(subst jpg,hp,$@)
 	convert $(subst jpg,ps,$@) -rotate -90 -trim $@

@@ -1,4 +1,3 @@
-{-# LANGUAGE BangPatterns #-}
 {-# LANGUAGE CPP #-}
 
 module Main (main) where
@@ -91,8 +90,8 @@ runDelay = \xs -> runST $ do
 
 -- | Return 0 but take n steps to do it
 foo :: Int -> Delay Int
-foo 0  = Now 0
-foo !n = Later (foo (n - 1))
+foo 0 = Now 0
+foo n = Later (foo (n - 1))
 
 evalProgress :: Progress -> IO ()
 evalProgress Done       = return ()
@@ -101,11 +100,20 @@ evalProgress (NotYet p) = evalProgress p
 main :: IO ()
 main = do
 #if defined(Top_ts)
-    let !(p, finalResult) =
+{-
+  NOTE: This is NOT the same as
+
+  > let !(p, finalResult) = runDelay (foo 10000000)
+
+  (at least, not with -O0)
+-}
+    case runDelay (foo 10000000) of
+      (p, finalResult) -> do
+        evalProgress p
+        print finalResult
 #endif
 #if defined(Top_tl)
-    let ~(p, finalResult) =
-#endif
-          runDelay (foo 10000000)
+    let ~(p, finalResult) = runDelay (foo 10000000)
     evalProgress p
     print finalResult
+#endif
